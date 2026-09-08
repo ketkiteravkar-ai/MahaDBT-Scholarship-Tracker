@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - MahaDBT Scholarship Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-md-10">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-warning text-white py-3">
+                <h4 class="card-title mb-0 fw-bold d-flex align-items-center">
+                    <i class="bi bi-person-circle me-2 fs-4"></i> My Profile
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="" novalidate>
+                    {% if form and form.hidden_tag is defined %}
+                        {{ form.hidden_tag() }}
+                    {% endif %}
+
+                    <!-- Fieldset 1: Personal Information -->
+                    <fieldset class="mb-4 p-3 border rounded">
+                        <legend class="float-none w-auto px-2 fs-5 fw-bold text-saffron">
+                            <i class="bi bi-person-lines-fill me-1"></i> Personal Information
+                        </legend>
+
+                        <div class="row g-3">
+                            <!-- Full Name -->
+                            <div class="col-md-6">
+                                <label for="full_name" class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                                {% if form and form.full_name is defined %}
+                                    {{ form.full_name(class="form-control" + (" is-invalid" if form.full_name.errors else ""), id="full_name", placeholder="Full Name") }}
+                                {% else %}
+                                    <input type="text" class="form-control" id="full_name" name="full_name"
+                                           value="{{ current_user.full_name if current_user and current_user.full_name else '' }}"
+                                           placeholder="Full Name" required>
+                                {% endif %}
+                                {% if form and form.full_name and form.full_name.errors %}
+                                    {% for error in form.full_name.errors %}
+                                        <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                                {% if form and form.phone is defined %}
+                                    {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else ""), id="phone", placeholder="10-digit mobile number") }}
+                                {% else %}
+                                    <input type="tel" class="form-control" id="phone" name="phone"
+                                           value="{{ profile.phone if profile and profile.phone else '' }}"
+                                           placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+                                {% endif %}
+                                {% if form and form.phone and form.phone.errors %}
+                                    {% for error in form.phone.errors %}
+                                        <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-md-6">
+                                <label for="category" class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                                {% set selected_cat = form.category.data if form and form.category and form.category.data else (profile.caste_category if profile and profile.caste_category else (profile.category if profile and profile.category is defined else '')) %}
+                                {% if form and form.category is defined %}
+                                    {{ form.category(class="form-select" + (" is-invalid" if form.category.errors else ""), id="category") }}
+                                {% else %}
+                                    <select class="form-select" id="category" name="category" required>
+                                        <option value="" disabled {% if not selected_cat %}selected{% endif %}>Select Category</option>
+                                        {% for cat in ['General', 'SC', 'ST', 'OBC', 'VJNT', 'SBC'] %}
+                                            <option value="{{ cat }}" {% if selected_cat == cat %}selected{% endif %}>{{ cat }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                                {% if form and form.category and form.category.errors %}
+                                    {% for error in form.category.errors %}
+                                        <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <!-- Annual Income -->
+                            <div class="col-md-6">
+                                <label for="annual_income" class="form-label fw-semibold">Annual Family Income (₹) <span class="text-danger">*</span></label>
+                                {% set current_income = form.annual_income.data if form and form.annual_income and form.annual_income.data else (profile.annual_family_income if profile and profile.annual_family_income else (profile.annual_income if profile and profile.annual_income is defined else '')) %}
+                                {% if form and form.annual_income is defined %}
+                                    {{ form.annual_income(class="form-control" + (" is-invalid" if form.annual_income.errors else ""), id="annual_income", placeholder="e.g. 150000") }}
+                                {% else %}
+                                    <input type="number" step="0.01" class="form-control" id="annual_income" name="annual_income"
+                                           value="{{ current_income }}"
+                                           placeholder="e.g. 150000" required>
+                                {% endif %}
+                                {% if form and form.annual_income and form.annual_income.errors %}
+                                    {% for error in form.annual_income.errors %}
+                                        <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Fieldset 2: Academic Information -->
+                    <fieldset class="mb-4 p-3 border rounded">
+                        <legend class="float-none w-auto px-2 fs-5 fw-bold text-saffron">
+                            <i class="bi bi-book-half me-1"></i> Academic Information
+                        </legend>
+
+                        <div class="row g-3">
+                            <!-- College Name -->
+                            <div class="col-md-12">
+                                <label for="college_name" class="form-label fw-semibold">College / Institute Name <span class="text-danger">*</span></label>
+                                {% set cur_college = form.college_name.data if form and form.college_name and form.college_name.data else (profile.college_name if profile and profile.college_name else '') %}
+                                {% if form and form.college_name is defined %}
+                                    {{ form.college_name(class="form-control" + (" is-invalid" if form.college_name.errors else ""), id="college_name", placeholder="Enter your college or institution name") }}
+                                {% else %}
+                                    <input type="text" class="form-control" id="college_name" name="college_name"
+                                           value="{{ cur_college }}"
+                                           placeholder="Enter your college or institution name" required>
+                                {% endif %}
+                                {% if form and form.college_name and form.college_name.errors %}
+                                    {% for error in form.college_name.errors %}
+                                        <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <!-- Course -->
+                            <div class="col-md-6">
+                                <label for="course" class="form-label fw-semibold">Course / Degree <span class="text-danger">*</span></label>
+                                {% set cur_course = form.course.data if form and form.course and form.course.data else (profile.course if profile and profile.course else '') %}
+                                {% if form and form.course is defined %}
+                                    {{ form.course(class="form-control" + (" is-invalid" if form.course.errors else ""), id="course", placeholder="e.g. B.Tech Computer Engineering") }}
+                                {% else %}
+                                    <input type="text" class="form-control" id="course" name="course"
+                                           value="{{ cur_course }}"
+                                           placeholder="e.g. B.Tech Computer Engineering" required>
+                                {% endif %}
+                                {% if form and form.course and form.course.errors %}
+                                    {% for error in form.course.errors %}
+                                        <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <!-- Year of Study -->
+                            <div class="col-md-6">
+                                <label for="year_of_study" class="form-label fw-semibold">Year of Study <span class="text-danger">*</span></label>
+                                {% set selected_year = (form.year_of_study.data|string) if form and form.year_of_study and form.year_of_study.data else ((profile.year_of_study|string) if profile and profile.year_of_study else '') %}
+                                {% if form and form.year_of_study is defined %}
+                                    {{ form.year_of_study(class="form-select" + (" is-invalid" if form.year_of_study.errors else ""), id="year_of_study") }}
+                                {% else %}
+                                    <select class="form-select" id="year_of_study" name="year_of_study" required>
+                                        <option value="" disabled {% if not selected_year %}selected{% endif %}>Select Year of Study</option>
+                                        <option value="1" {% if selected_year == '1' %}selected{% endif %}>1st Year</option>
+                                        <option value="2" {% if selected_year == '2' %}selected{% endif %}>2nd Year</option>
+                                        <option value="3" {% if selected_year == '3' %}selected{% endif %}>3rd Year</option>
+                                        <option value="4" {% if selected_year == '4' %}selected{% endif %}>4th Year</option>
+                                        <option value="5" {% if selected_year == '5' %}selected{% endif %}>5th Year</option>
+                                    </select>
+                                {% endif %}
+                                {% if form and form.year_of_study and form.year_of_study.errors %}
+                                    {% for error in form.year_of_study.errors %}
+                                        <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Fieldset 3: Bank Details -->
+                    <fieldset class="mb-4 p-3 border rounded">
+                        <legend class="float-none w-auto px-2 fs-5 fw-bold text-saffron">
+                            <i class="bi bi-bank me-1"></i> Bank Details (for Direct Benefit Transfer)
+                        </legend>
+
+                        <div class="row g-3">
+                            <!-- Bank Account -->
+                            <div class="col-md-6">
+                                <label for="bank_account" class="form-label fw-semibold">Bank Account Number <span class="text-danger">*</span></label>
+                                {% set cur_acc = form.bank_account.data if form and form.bank_account and form.bank_account.data else (profile.bank_account if profile and profile.bank_account is defined else '') %}
+                                {% if form and form.bank_account is defined %}
+                                    {{ form.bank_account(class="form-control" + (" is-invalid" if form.bank_account.errors else ""), id="bank_account", placeholder="Enter bank account number") }}
+                                {% else %}
+                                    <input type="text" class="form-control" id="bank_account" name="bank_account"
+                                           value="{{ cur_acc }}"
+                                           placeholder="Enter bank account number" required>
+                                {% endif %}
+                                {% if form and form.bank_account and form.bank_account.errors %}
+                                    {% for error in form.bank_account.errors %}
+                                        <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <!-- IFSC Code -->
+                            <div class="col-md-6">
+                                <label for="ifsc_code" class="form-label fw-semibold">IFSC Code <span class="text-danger">*</span></label>
+                                {% set cur_ifsc = form.ifsc_code.data if form and form.ifsc_code and form.ifsc_code.data else (profile.ifsc_code if profile and profile.ifsc_code is defined else '') %}
+                                {% if form and form.ifsc_code is defined %}
+                                    {{ form.ifsc_code(class="form-control text-uppercase" + (" is-invalid" if form.ifsc_code.errors else ""), id="ifsc_code", placeholder="e.g. SBIN0001234") }}
+                                {% else %}
+                                    <input type="text" class="form-control text-uppercase" id="ifsc_code" name="ifsc_code"
+                                           value="{{ cur_ifsc }}"
+                                           placeholder="e.g. SBIN0001234" maxlength="11" required>
+                                {% endif %}
+                                {% if form and form.ifsc_code and form.ifsc_code.errors %}
+                                    {% for error in form.ifsc_code.errors %}
+                                        <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Submit Button -->
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-warning text-white fw-semibold px-4 py-2 shadow-sm">
+                            <i class="bi bi-check2-circle me-1"></i> Update Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

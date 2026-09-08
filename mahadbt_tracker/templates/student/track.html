@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Applications - MahaDBT Scholarship Tracker{% endblock %}
+
+{% block extra_head %}
+<style>
+    .timeline-steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin: 2rem 0 1rem;
+    }
+    .timeline-step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+    .timeline-step .step-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .step-icon.passed {
+        background-color: #198754;
+        color: #ffffff;
+        box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.2);
+    }
+    .step-icon.current {
+        background-color: #FF6600;
+        color: #ffffff;
+        box-shadow: 0 0 0 5px rgba(255, 102, 0, 0.25);
+        animation: pulse 2s infinite;
+    }
+    .step-icon.pending {
+        background-color: #e9ecef;
+        color: #6c757d;
+        border: 2px solid #dee2e6;
+    }
+    .step-icon.rejected {
+        background-color: #dc3545;
+        color: #ffffff;
+        box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.2);
+    }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(255, 102, 0, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0); }
+    }
+    .step-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-2 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1">Track Your Applications</h2>
+            <p class="text-muted mb-0">Monitor the live progress and verification stages of your scholarship applications.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="/scholarships" class="btn btn-warning text-white fw-semibold">
+                <i class="bi bi-award me-1"></i> Apply for More
+            </a>
+        </div>
+    </div>
+
+    {% set app_list = applications if applications is defined else (current_user.applications.all() if current_user.applications and current_user.applications.all is defined else []) %}
+
+    {% if app_list and app_list|length > 0 %}
+        <div class="row g-4">
+            {% for app in app_list %}
+                {% set st = (app.status|string|lower) %}
+                {% set is_rejected = ('reject' in st) %}
+                {% set is_approved = ('approv' in st) %}
+                {% set is_verified = ('verif' in st) %}
+                {% set is_under_review = ('review' in st) %}
+                {% set is_submitted = ('submit' in st or st == 'draft' or st == 'resubmitted') %}
+
+                <div class="col-12">
+                    <div class="card shadow-sm border-0">
+                        <!-- Card Header -->
+                        <div class="card-header bg-white py-3 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1">
+                                    {{ app.scholarship.name if app.scholarship and app.scholarship.name is defined else (app.scholarship_name if app.scholarship_name is defined else 'Scholarship Scheme') }}
+                                </h5>
+                                <div class="text-muted small">
+                                    <span>Application ID: <strong>#{{ app.application_number if app.application_number is defined else app.id }}</strong></span>
+                                    <span class="mx-2">•</span>
+                                    <span>Applied: <strong>{{ app.applied_date.strftime('%d %b %Y, %I:%M %p') if app.applied_date and app.applied_date.strftime is defined else (app.applied_date or 'N/A') }}</strong></span>
+                                </div>
+                            </div>
+                            <div class="mt-2 mt-md-0">
+                                {% if 'submit' in st %}
+                                    <span class="badge bg-info text-dark fs-6 px-3 py-2"><i class="bi bi-send me-1"></i>Submitted</span>
+                                {% elif 'review' in st %}
+                                    <span class="badge bg-warning text-dark fs-6 px-3 py-2"><i class="bi bi-hourglass-split me-1"></i>Under Review</span>
+                                {% elif 'verif' in st %}
+                                    <span class="badge bg-primary fs-6 px-3 py-2"><i class="bi bi-patch-check me-1"></i>Verified</span>
+                                {% elif 'approv' in st %}
+                                    <span class="badge bg-success fs-6 px-3 py-2"><i class="bi bi-check-circle me-1"></i>Approved</span>
+                                {% elif 'reject' in st %}
+                                    <span class="badge bg-danger fs-6 px-3 py-2"><i class="bi bi-x-circle me-1"></i>Rejected</span>
+                                {% else %}
+                                    <span class="badge bg-secondary fs-6 px-3 py-2">{{ app.status|replace('_', ' ')|title }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="card-body p-4">
+                            <!-- Visual Timeline / Progress Steps -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-muted small text-uppercase mb-3">Application Progress</h6>
+
+                                <!-- Progress Bar Track -->
+                                <div class="progress" style="height: 6px;">
+                                    {% if is_rejected %}
+                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                    {% elif is_approved %}
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                    {% elif is_verified %}
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                    {% elif is_under_review %}
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                    {% else %}
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Step Indicators -->
+                                <div class="timeline-steps">
+                                    <!-- Stage 1: Submitted -->
+                                    <div class="timeline-step">
+                                        {% if is_approved or is_verified or is_under_review or is_rejected %}
+                                            <div class="step-icon passed"><i class="bi bi-check-lg"></i></div>
+                                            <div class="step-title text-success">Submitted</div>
+                                        {% else %}
+                                            <div class="step-icon current"><i class="bi bi-send"></i></div>
+                                            <div class="step-title text-saffron">Submitted</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Stage 2: Under Review -->
+                                    <div class="timeline-step">
+                                        {% if is_rejected %}
+                                            <div class="step-icon rejected"><i class="bi bi-x-lg"></i></div>
+                                            <div class="step-title text-danger">Review (Rejected)</div>
+                                        {% elif is_approved or is_verified %}
+                                            <div class="step-icon passed"><i class="bi bi-check-lg"></i></div>
+                                            <div class="step-title text-success">Under Review</div>
+                                        {% elif is_under_review %}
+                                            <div class="step-icon current"><i class="bi bi-hourglass-split"></i></div>
+                                            <div class="step-title text-saffron">Under Review</div>
+                                        {% else %}
+                                            <div class="step-icon pending"><i class="bi bi-hourglass"></i></div>
+                                            <div class="step-title text-muted">Under Review</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Stage 3: Verified -->
+                                    <div class="timeline-step">
+                                        {% if is_rejected %}
+                                            <div class="step-icon pending"><i class="bi bi-dash"></i></div>
+                                            <div class="step-title text-muted">Verified</div>
+                                        {% elif is_approved %}
+                                            <div class="step-icon passed"><i class="bi bi-check-lg"></i></div>
+                                            <div class="step-title text-success">Verified</div>
+                                        {% elif is_verified %}
+                                            <div class="step-icon current"><i class="bi bi-patch-check"></i></div>
+                                            <div class="step-title text-saffron">Verified</div>
+                                        {% else %}
+                                            <div class="step-icon pending"><i class="bi bi-patch-check"></i></div>
+                                            <div class="step-title text-muted">Verified</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Stage 4: Approved -->
+                                    <div class="timeline-step">
+                                        {% if is_rejected %}
+                                            <div class="step-icon pending"><i class="bi bi-dash"></i></div>
+                                            <div class="step-title text-muted">Approved</div>
+                                        {% elif is_approved %}
+                                            <div class="step-icon passed"><i class="bi bi-trophy"></i></div>
+                                            <div class="step-title text-success">Approved</div>
+                                        {% else %}
+                                            <div class="step-icon pending"><i class="bi bi-trophy"></i></div>
+                                            <div class="step-title text-muted">Approved</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Remarks Section (if any remarks exist) -->
+                            {% if app.remarks %}
+                                <div class="alert {% if is_rejected %}alert-danger{% elif is_approved %}alert-success{% else %}alert-warning{% endif %} d-flex align-items-start mb-3" role="alert">
+                                    <i class="bi {% if is_rejected %}bi-exclamation-triangle-fill{% elif is_approved %}bi-check-circle-fill{% else %}bi-info-circle-fill{% endif %} me-2 fs-5"></i>
+                                    <div>
+                                        <strong class="d-block">Review Remarks:</strong>
+                                        <span>{{ app.remarks }}</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Application Details & Timestamp -->
+                            <div class="row text-muted small pt-2 border-top">
+                                <div class="col-sm-6">
+                                    <i class="bi bi-building me-1"></i>
+                                    <strong>Department:</strong> {{ app.scholarship.department if app.scholarship and app.scholarship.department else 'Social Welfare / Tribal Welfare' }}
+                                </div>
+                                <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
+                                    <i class="bi bi-clock me-1"></i>
+                                    <strong>Last Updated:</strong>
+                                    {{ app.last_updated.strftime('%d %b %Y, %I:%M %p') if app.last_updated and app.last_updated.strftime is defined else (app.last_updated or 'N/A') }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <div class="card shadow-sm border-0 p-5 mx-auto" style="max-width: 500px;">
+                <i class="bi bi-clipboard-x fs-1 text-muted mb-3"></i>
+                <h5 class="text-muted fw-bold">You haven't applied to any scholarships yet.</h5>
+                <p class="text-secondary small mb-3">Discover eligible government scholarship schemes and start your application.</p>
+                <a href="/scholarships" class="btn btn-warning text-white fw-semibold mx-auto">
+                    <i class="bi bi-award me-1"></i> Browse Scholarships
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

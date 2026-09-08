@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - MahaDBT Scholarship Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5 mx-auto mt-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-warning text-white py-3">
+                <h4 class="card-title mb-0 fw-bold d-flex align-items-center">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Student / Admin Login
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="" novalidate>
+                    {% if form and form.hidden_tag is defined %}
+                        {{ form.hidden_tag() }}
+                    {% endif %}
+
+                    <!-- Email Field -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-semibold">
+                            <i class="bi bi-envelope me-1"></i> Email Address
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                            {% if form and form.email is defined %}
+                                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="name@example.com", id="email") }}
+                            {% else %}
+                                <input type="email" class="form-control" id="email" name="email" value="{{ email if email is defined else '' }}" placeholder="name@example.com" required>
+                            {% endif %}
+                        </div>
+                        {% if form and form.email and form.email.errors %}
+                            {% for error in form.email.errors %}
+                                <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-semibold">
+                            <i class="bi bi-lock me-1"></i> Password
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                            {% if form and form.password is defined %}
+                                {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Enter your password", id="password") }}
+                            {% else %}
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                            {% endif %}
+                        </div>
+                        {% if form and form.password and form.password.errors %}
+                            {% for error in form.password.errors %}
+                                <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-warning text-white w-100 fw-semibold py-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                        </button>
+                    </div>
+
+                    <!-- Register Link -->
+                    <div class="text-center mt-3">
+                        <span class="text-muted">Don't have an account?</span>
+                        <a href="/register" class="fw-semibold text-decoration-none text-saffron ms-1">Register here</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

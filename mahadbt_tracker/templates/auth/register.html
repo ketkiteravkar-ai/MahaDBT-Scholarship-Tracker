@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Registration - MahaDBT Scholarship Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 mx-auto mt-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-warning text-white py-3">
+                <h4 class="card-title mb-0 fw-bold d-flex align-items-center">
+                    <i class="bi bi-person-plus me-2"></i> Student Registration
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="" novalidate>
+                    {% if form and form.hidden_tag is defined %}
+                        {{ form.hidden_tag() }}
+                    {% endif %}
+
+                    <!-- Row 1: Full Name & Email -->
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="full_name" class="form-label fw-semibold">
+                                <i class="bi bi-person me-1"></i> Full Name
+                            </label>
+                            {% if form and form.full_name is defined %}
+                                {{ form.full_name(class="form-control" + (" is-invalid" if form.full_name.errors else ""), placeholder="Enter full name", id="full_name") }}
+                            {% else %}
+                                <input type="text" class="form-control" id="full_name" name="full_name" value="{{ full_name if full_name is defined else '' }}" placeholder="Enter full name" required>
+                            {% endif %}
+                            {% if form and form.full_name and form.full_name.errors %}
+                                {% for error in form.full_name.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="email" class="form-label fw-semibold">
+                                <i class="bi bi-envelope me-1"></i> Email Address
+                            </label>
+                            {% if form and form.email is defined %}
+                                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="name@example.com", id="email") }}
+                            {% else %}
+                                <input type="email" class="form-control" id="email" name="email" value="{{ email if email is defined else '' }}" placeholder="name@example.com" required>
+                            {% endif %}
+                            {% if form and form.email and form.email.errors %}
+                                {% for error in form.email.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Aadhaar & Phone -->
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="aadhaar" class="form-label fw-semibold">
+                                <i class="bi bi-card-heading me-1"></i> Aadhaar Number
+                            </label>
+                            {% if form and form.aadhaar is defined %}
+                                {{ form.aadhaar(class="form-control" + (" is-invalid" if form.aadhaar.errors else ""), placeholder="12-digit Aadhaar", id="aadhaar") }}
+                            {% elif form and form.aadhar_number is defined %}
+                                {{ form.aadhar_number(class="form-control" + (" is-invalid" if form.aadhar_number.errors else ""), placeholder="12-digit Aadhaar", id="aadhaar") }}
+                            {% else %}
+                                <input type="text" class="form-control" id="aadhaar" name="aadhaar" pattern="[0-9]{12}" maxlength="12" value="{{ aadhaar if aadhaar is defined else '' }}" placeholder="12-digit Aadhaar" required>
+                            {% endif %}
+                            {% if form and form.aadhaar and form.aadhaar.errors %}
+                                {% for error in form.aadhaar.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% elif form and form.aadhar_number and form.aadhar_number.errors %}
+                                {% for error in form.aadhar_number.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label fw-semibold">
+                                <i class="bi bi-telephone me-1"></i> Phone Number
+                            </label>
+                            {% if form and form.phone is defined %}
+                                {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else ""), placeholder="10-digit mobile number", id="phone") }}
+                            {% else %}
+                                <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]{10}" maxlength="10" value="{{ phone if phone is defined else '' }}" placeholder="10-digit mobile number" required>
+                            {% endif %}
+                            {% if form and form.phone and form.phone.errors %}
+                                {% for error in form.phone.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Password & Confirm Password -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="password" class="form-label fw-semibold">
+                                <i class="bi bi-lock me-1"></i> Password
+                            </label>
+                            {% if form and form.password is defined %}
+                                {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Create password", id="password") }}
+                            {% else %}
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Create password" required>
+                            {% endif %}
+                            {% if form and form.password and form.password.errors %}
+                                {% for error in form.password.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="confirm" class="form-label fw-semibold">
+                                <i class="bi bi-shield-check me-1"></i> Confirm Password
+                            </label>
+                            {% if form and form.confirm is defined %}
+                                {{ form.confirm(class="form-control" + (" is-invalid" if form.confirm.errors else ""), placeholder="Re-enter password", id="confirm") }}
+                            {% elif form and form.confirm_password is defined %}
+                                {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""), placeholder="Re-enter password", id="confirm") }}
+                            {% else %}
+                                <input type="password" class="form-control" id="confirm" name="confirm" placeholder="Re-enter password" required>
+                            {% endif %}
+                            {% if form and form.confirm and form.confirm.errors %}
+                                {% for error in form.confirm.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% elif form and form.confirm_password and form.confirm_password.errors %}
+                                {% for error in form.confirm_password.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-warning text-white w-100 fw-semibold py-2">
+                            <i class="bi bi-person-plus me-1"></i> Register
+                        </button>
+                    </div>
+
+                    <!-- Login Link -->
+                    <div class="text-center mt-3">
+                        <span class="text-muted">Already have an account?</span>
+                        <a href="/login" class="fw-semibold text-decoration-none text-saffron ms-1">Login here</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

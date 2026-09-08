@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply for {{ scholarship.name }} - MahaDBT Scholarship Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <!-- Navigation Back Link -->
+        <div class="mb-3">
+            <a href="/scholarships" class="text-decoration-none text-muted small fw-semibold">
+                <i class="bi bi-arrow-left me-1"></i> Back to Scholarships
+            </a>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <!-- Card Header -->
+            <div class="card-header bg-warning text-white py-3">
+                <h4 class="card-title mb-0 fw-bold d-flex align-items-center">
+                    <i class="bi bi-file-earmark-plus me-2 fs-4"></i> Apply for {{ scholarship.name }}
+                </h4>
+            </div>
+
+            <div class="card-body p-4">
+                <!-- Scholarship Details Summary -->
+                <div class="bg-light p-3 rounded-3 mb-4 border">
+                    <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                        <i class="bi bi-info-circle text-primary me-2"></i>Scheme Summary
+                    </h5>
+                    <div class="row g-3 small">
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block">Department:</span>
+                            <span class="fw-bold text-dark">{{ scholarship.department or 'Government of Maharashtra' }}</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block">Scholarship Amount:</span>
+                            <span class="fw-bold text-success fs-6">
+                                ₹{{ "{:,.0f}".format(scholarship.amount) if scholarship.amount is number else scholarship.amount }}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block">Application Deadline:</span>
+                            <span class="fw-bold text-danger">
+                                {% if scholarship.deadline %}
+                                    {{ scholarship.deadline.strftime('%d %b %Y') if scholarship.deadline.strftime is defined else scholarship.deadline }}
+                                {% else %}
+                                    Ongoing
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted d-block">Eligible Category:</span>
+                            <span class="fw-bold text-dark">
+                                {% if scholarship.criteria and scholarship.criteria.caste_categories %}
+                                    {{ scholarship.criteria.caste_categories }}
+                                {% elif scholarship.category_filter is defined and scholarship.category_filter %}
+                                    {{ scholarship.category_filter }}
+                                {% elif scholarship.category is defined and scholarship.category %}
+                                    {{ scholarship.category }}
+                                {% else %}
+                                    All Categories
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="col-12">
+                            <span class="text-muted d-block">Eligibility Criteria:</span>
+                            <span class="text-secondary">
+                                {% if scholarship.criteria %}
+                                    Income Limit: Up to ₹{{ "{:,.0f}".format(scholarship.criteria.max_income) if scholarship.criteria.max_income else 'None' }}
+                                    {% if scholarship.criteria.min_percentage %}| Min Marks: {{ scholarship.criteria.min_percentage }}%{% endif %}
+                                    {% if scholarship.criteria.eligible_courses %}| Courses: {{ scholarship.criteria.eligible_courses }}{% endif %}
+                                {% elif scholarship.eligibility_criteria is defined and scholarship.eligibility_criteria %}
+                                    {{ scholarship.eligibility_criteria }}
+                                {% else %}
+                                    Candidate must be a resident of Maharashtra enrolled in a recognized institution with complete profile details.
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Form -->
+                <form method="POST" action="" enctype="multipart/form-data" novalidate>
+                    {% if form and form.hidden_tag is defined %}
+                        {{ form.hidden_tag() }}
+                    {% endif %}
+
+                    <!-- Student Profile Confirmation Notice -->
+                    <div class="alert alert-info py-2 px-3 mb-4 small">
+                        <i class="bi bi-person-check-fill me-1"></i>
+                        Applying as <strong>{{ current_user.full_name }}</strong> ({{ current_user.email }}).
+                        Make sure your <a href="/student/profile" class="alert-link">profile details</a> are up to date.
+                    </div>
+
+                    <!-- File Upload Field -->
+                    <div class="mb-4">
+                        <label for="document" class="form-label fw-bold">
+                            <i class="bi bi-cloud-arrow-up me-1"></i> Upload Supporting Document (PDF/JPG, max 16MB) <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            {% if form and form.document is defined %}
+                                {{ form.document(class="form-control" + (" is-invalid" if form.document.errors else ""), id="document", accept=".pdf,.jpg,.jpeg,.png") }}
+                            {% else %}
+                                <input class="form-control" type="file" id="document" name="document" accept=".pdf,.jpg,.jpeg,.png" required>
+                            {% endif %}
+                        </div>
+                        <div class="form-text text-muted">
+                            Upload combined PDF or image of Aadhaar Card, Income Certificate, Caste Certificate, or Fee Receipt.
+                        </div>
+                        {% if form and form.document and form.document.errors %}
+                            {% for error in form.document.errors %}
+                                <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <!-- Undertaking Checkbox -->
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="declaration" name="declaration" required checked>
+                        <label class="form-check-label small text-muted" for="declaration">
+                            I declare that the information and documents submitted above are true and correct to the best of my knowledge.
+                        </label>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="/scholarships" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-warning text-white fw-semibold px-4 py-2 shadow-sm">
+                            <i class="bi bi-check2-circle me-1"></i> Submit Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

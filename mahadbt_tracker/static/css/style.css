@@ -1,0 +1,88 @@
+/* MahaDBT Scholarship Tracker Stylesheet */
+:root {
+    --mahadbt-saffron: #FF6600;
+    --mahadbt-saffron-hover: #e05a00;
+    --mahadbt-saffron-dark: #cc5200;
+    --mahadbt-saffron-light: #fff3eb;
+}
+
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+/* Saffron Palette */
+.bg-saffron {
+    background-color: var(--mahadbt-saffron) !important;
+}
+
+.text-saffron {
+    color: var(--mahadbt-saffron) !important;
+}
+
+.border-saffron {
+    border-color: var(--mahadbt-saffron) !important;
+}
+
+/* Primary Button Styling with Saffron Theme */
+.btn-warning,
+.btn-saffron {
+    background-color: var(--mahadbt-saffron) !important;
+    border-color: var(--mahadbt-saffron) !important;
+    color: #ffffff !important;
+}
+
+.btn-warning:hover,
+.btn-warning:focus,
+.btn-saffron:hover,
+.btn-saffron:focus {
+    background-color: var(--mahadbt-saffron-hover) !important;
+    border-color: var(--mahadbt-saffron-dark) !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-warning {
+    color: var(--mahadbt-saffron) !important;
+    border-color: var(--mahadbt-saffron) !important;
+}
+
+.btn-outline-warning:hover {
+    background-color: var(--mahadbt-saffron) !important;
+    border-color: var(--mahadbt-saffron) !important;
+    color: #ffffff !important;
+}
+
+/* Card Styling */
+.card {
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+    border-top-left-radius: 0.5rem !important;
+    border-top-right-radius: 0.5rem !important;
+}
+
+/* Form Controls */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--mahadbt-saffron);
+    box-shadow: 0 0 0 0.25rem rgba(255, 102, 0, 0.25);
+}
+
+/* Table Styling */
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 102, 0, 0.03);
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+}

@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if scholarship %}Edit Scholarship{% else %}Add Scholarship{% endif %} - MahaDBT Scholarship Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-md-10">
+        <!-- Navigation Back -->
+        <div class="mb-3">
+            <a href="/admin/scholarships" class="text-decoration-none text-muted small fw-semibold">
+                <i class="bi bi-arrow-left me-1"></i> Back to All Schemes
+            </a>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <!-- Card Header -->
+            <div class="card-header bg-warning text-white py-3">
+                <h4 class="card-title mb-0 fw-bold d-flex align-items-center">
+                    <i class="bi {% if scholarship %}bi-pencil-square{% else %}bi-plus-circle{% endif %} me-2 fs-4"></i>
+                    {% if scholarship %}Edit Scholarship Scheme{% else %}Add New Scholarship Scheme{% endif %}
+                </h4>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body p-4">
+                <form method="POST" action="" novalidate>
+                    {% if form and form.hidden_tag is defined %}
+                        {{ form.hidden_tag() }}
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <!-- Scheme Name -->
+                        <div class="col-md-12">
+                            <label for="name" class="form-label fw-semibold">Scheme Name <span class="text-danger">*</span></label>
+                            {% set cur_name = form.name.data if form and form.name and form.name.data else (scholarship.name if scholarship and scholarship.name else '') %}
+                            {% if form and form.name is defined %}
+                                {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else ""), id="name", placeholder="e.g. Post-Matric Scholarship Scheme") }}
+                            {% else %}
+                                <input type="text" class="form-control" id="name" name="name"
+                                       value="{{ cur_name }}"
+                                       placeholder="e.g. Post-Matric Scholarship Scheme" required>
+                            {% endif %}
+                            {% if form and form.name and form.name.errors %}
+                                {% for error in form.name.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Department -->
+                        <div class="col-md-6">
+                            <label for="department" class="form-label fw-semibold">Department <span class="text-danger">*</span></label>
+                            {% set cur_dept = form.department.data if form and form.department and form.department.data else (scholarship.department if scholarship and scholarship.department else '') %}
+                            {% if form and form.department is defined %}
+                                {{ form.department(class="form-control" + (" is-invalid" if form.department.errors else ""), id="department", placeholder="e.g. Social Justice & Special Assistance") }}
+                            {% else %}
+                                <input type="text" class="form-control" id="department" name="department"
+                                       value="{{ cur_dept }}"
+                                       placeholder="e.g. Social Justice & Special Assistance" required>
+                            {% endif %}
+                            {% if form and form.department and form.department.errors %}
+                                {% for error in form.department.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Amount -->
+                        <div class="col-md-6">
+                            <label for="amount" class="form-label fw-semibold">Scholarship Amount (₹) <span class="text-danger">*</span></label>
+                            {% set cur_amt = form.amount.data if form and form.amount and form.amount.data else (scholarship.amount if scholarship and scholarship.amount else '') %}
+                            {% if form and form.amount is defined %}
+                                {{ form.amount(class="form-control" + (" is-invalid" if form.amount.errors else ""), id="amount", placeholder="e.g. 50000") }}
+                            {% else %}
+                                <input type="number" step="0.01" class="form-control" id="amount" name="amount"
+                                       value="{{ cur_amt }}"
+                                       placeholder="e.g. 50000" required>
+                            {% endif %}
+                            {% if form and form.amount and form.amount.errors %}
+                                {% for error in form.amount.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Category Filter -->
+                        <div class="col-md-6">
+                            <label for="category_filter" class="form-label fw-semibold">Target Category <span class="text-danger">*</span></label>
+                            {% set cur_cat = form.category_filter.data if form and form.category_filter and form.category_filter.data else (scholarship.criteria.caste_categories if scholarship and scholarship.criteria and scholarship.criteria.caste_categories else (scholarship.category_filter if scholarship and scholarship.category_filter is defined else (scholarship.category if scholarship and scholarship.category is defined else 'All'))) %}
+                            {% if form and form.category_filter is defined %}
+                                {{ form.category_filter(class="form-select" + (" is-invalid" if form.category_filter.errors else ""), id="category_filter") }}
+                            {% else %}
+                                <select class="form-select" id="category_filter" name="category_filter" required>
+                                    <option value="All" {% if cur_cat == 'All' or not cur_cat %}selected{% endif %}>All Categories</option>
+                                    <option value="SC" {% if cur_cat == 'SC' %}selected{% endif %}>SC</option>
+                                    <option value="ST" {% if cur_cat == 'ST' %}selected{% endif %}>ST</option>
+                                    <option value="OBC" {% if cur_cat == 'OBC' %}selected{% endif %}>OBC</option>
+                                    <option value="VJNT" {% if cur_cat == 'VJNT' %}selected{% endif %}>VJNT</option>
+                                    <option value="SBC" {% if cur_cat == 'SBC' %}selected{% endif %}>SBC</option>
+                                    <option value="General" {% if cur_cat == 'General' %}selected{% endif %}>General</option>
+                                </select>
+                            {% endif %}
+                            {% if form and form.category_filter and form.category_filter.errors %}
+                                {% for error in form.category_filter.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Income Limit -->
+                        <div class="col-md-6">
+                            <label for="income_limit" class="form-label fw-semibold">Annual Income Limit (₹)</label>
+                            {% set cur_inc = form.income_limit.data if form and form.income_limit and form.income_limit.data else (scholarship.criteria.max_income if scholarship and scholarship.criteria and scholarship.criteria.max_income else (scholarship.income_limit if scholarship and scholarship.income_limit is defined else '')) %}
+                            {% if form and form.income_limit is defined %}
+                                {{ form.income_limit(class="form-control" + (" is-invalid" if form.income_limit.errors else ""), id="income_limit", placeholder="e.g. 250000") }}
+                            {% else %}
+                                <input type="number" step="0.01" class="form-control" id="income_limit" name="income_limit"
+                                       value="{{ cur_inc }}"
+                                       placeholder="e.g. 250000">
+                            {% endif %}
+                            {% if form and form.income_limit and form.income_limit.errors %}
+                                {% for error in form.income_limit.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Deadline -->
+                        <div class="col-md-6">
+                            <label for="deadline" class="form-label fw-semibold">Application Deadline</label>
+                            {% set cur_deadline = form.deadline.data.strftime('%Y-%m-%d') if form and form.deadline and form.deadline.data and form.deadline.data.strftime is defined else (scholarship.deadline.strftime('%Y-%m-%d') if scholarship and scholarship.deadline and scholarship.deadline.strftime is defined else (scholarship.deadline if scholarship and scholarship.deadline else '')) %}
+                            {% if form and form.deadline is defined %}
+                                {{ form.deadline(class="form-control" + (" is-invalid" if form.deadline.errors else ""), id="deadline", type="date") }}
+                            {% else %}
+                                <input type="date" class="form-control" id="deadline" name="deadline"
+                                       value="{{ cur_deadline }}">
+                            {% endif %}
+                            {% if form and form.deadline and form.deadline.errors %}
+                                {% for error in form.deadline.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Active Status Checkbox -->
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="form-check form-switch mt-4">
+                                {% set is_checked = form.is_active.data if form and form.is_active and form.is_active.data is defined else (scholarship.is_active if scholarship and scholarship.is_active is defined else true) %}
+                                {% if form and form.is_active is defined %}
+                                    {{ form.is_active(class="form-check-input", id="is_active") }}
+                                {% else %}
+                                    <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if is_checked %}checked{% endif %}>
+                                {% endif %}
+                                <label class="form-check-label fw-semibold ms-2" for="is_active">
+                                    Scheme is Active and open for applications
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-md-12">
+                            <label for="description" class="form-label fw-semibold">Scheme Description</label>
+                            {% set cur_desc = form.description.data if form and form.description and form.description.data else (scholarship.description if scholarship and scholarship.description else '') %}
+                            {% if form and form.description is defined %}
+                                {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), id="description", rows=4, placeholder="Provide a detailed description of the scholarship scheme...") }}
+                            {% else %}
+                                <textarea class="form-control" id="description" name="description" rows="4" placeholder="Provide a detailed description of the scholarship scheme...">{{ cur_desc }}</textarea>
+                            {% endif %}
+                            {% if form and form.description and form.description.errors %}
+                                {% for error in form.description.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Eligibility Criteria -->
+                        <div class="col-md-12">
+                            <label for="eligibility_criteria" class="form-label fw-semibold">Eligibility Criteria</label>
+                            {% set cur_elig = form.eligibility_criteria.data if form and form.eligibility_criteria and form.eligibility_criteria.data else (scholarship.eligibility_criteria if scholarship and scholarship.eligibility_criteria is defined else (scholarship.criteria.eligible_courses if scholarship and scholarship.criteria and scholarship.criteria.eligible_courses else '')) %}
+                            {% if form and form.eligibility_criteria is defined %}
+                                {{ form.eligibility_criteria(class="form-control" + (" is-invalid" if form.eligibility_criteria.errors else ""), id="eligibility_criteria", rows=3, placeholder="List eligible courses, qualification requirements, domicile condition...") }}
+                            {% else %}
+                                <textarea class="form-control" id="eligibility_criteria" name="eligibility_criteria" rows="3" placeholder="List eligible courses, qualification requirements, domicile condition...">{{ cur_elig }}</textarea>
+                            {% endif %}
+                            {% if form and form.eligibility_criteria and form.eligibility_criteria.errors %}
+                                {% for error in form.eligibility_criteria.errors %}
+                                    <small class="text-danger d-block mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</small>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <a href="/admin/scholarships" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-warning text-white fw-semibold px-4 py-2 shadow-sm">
+                            <i class="bi bi-check2-circle me-1"></i>
+                            {% if scholarship %}Update Scholarship{% else %}Save Scholarship{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
